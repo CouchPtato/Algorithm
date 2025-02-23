@@ -14,7 +14,7 @@ int Max(int arr[], int n)
 }
 void countSort(int arr[], int n, int exp)
 {
-    int output[n];  
+    int output[20];  
     // int m = Max(arr, n);
     int count[10] = {0};
     for (int i = 0; i < n; i++)
