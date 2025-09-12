@@ -1,13 +1,16 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+int comparisons = 0;
+
 int partition(vector<int> &A, int p, int r)
 {
     int x = A[r];
     int i = p - 1;
-    for(int j = p; j <= r - 1; j++)
+    for (int j = p; j <= r - 1; j++)
     {
-        if(A[j] <= x)
+        comparisons++;
+        if (A[j] <= x)
         {
             i = i + 1;
             swap(A[i], A[j]);
@@ -26,7 +29,7 @@ int randomisedPartition(vector<int> &A, int p, int r)
 
 void quickSort(vector<int> &A, int p, int r)
 {
-    if(p < r)
+    if (p < r)
     {
         int q = randomisedPartition(A, p, r);
         quickSort(A, p, q - 1);
@@ -41,9 +44,12 @@ int main()
 
     quickSort(A, 0, n - 1);
 
-    for(int x : A)
+    cout << "Sorted array : ";
+    for (int x : A)
         cout << x << " ";
     cout << "\n";
+
+    cout << "Number of comparisons: " << comparisons << "\n";
 
     return 0;
 }
