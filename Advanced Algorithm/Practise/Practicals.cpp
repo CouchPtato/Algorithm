@@ -96,98 +96,196 @@ using namespace std;
 //     return 0;
 // }
 
-struct Edge
+// struct Edge
+// {
+//     int u, v, w;
+// };
+
+// struct DSU
+// {
+//     vector<int> parent, rank;
+
+//     DSU (int n)
+//     {
+//         parent.resize(n);
+//         rank.assign(n, 0);
+
+//         for(int i = 0; i < n; i++)
+//         {
+//             parent[i] = i;
+//         }
+//     }
+
+//     int find(int x)
+//     {
+//         if(parent[x] == x)
+//         {
+//             return x;
+//         }
+//         return parent[x] = find(parent[x]); // path compression
+//     }
+
+//     void unite(int x, int y)
+//     {
+//         x = find(x);
+//         y = find(y);
+
+//         if(x == y) return;
+
+//         if(rank[x] < rank[y])
+//             parent[x] = y;
+//         else if(rank[y] < rank[x])
+//             parent[y] = x;
+//         else
+//         {
+//             parent[y] = x;
+//             rank[x]++;
+//         }
+//     }
+// };
+
+// int main() 
+// {
+//     int V, E;
+
+//     cout << "Enter number of vertices: ";
+//     cin >> V;
+//     cout << "Enter number of edges: ";
+//     cin >> E;
+
+//     vector<Edge> edges(E);
+
+//     cout << "Enter edges (u v w) with vertices numbered 0 to " << V - 1 << ":\n";
+
+//     for (int i = 0; i < E; i++) 
+//     {
+//         cin >> edges[i].u >> edges[i].v >> edges[i].w;
+//     }
+
+//     // Sort edges by weight
+//     sort(edges.begin(), edges.end(), [](const Edge &a, const Edge &b) 
+//     {
+//         return a.w < b.w;
+//     });
+
+//     DSU dsu(V);
+//     int mstWeight = 0;
+//     vector<Edge> mstEdges;
+
+//     for (auto &e : edges) 
+//     {
+//         if (dsu.find(e.u) != dsu.find(e.v)) 
+//         {
+//             dsu.unite(e.u, e.v);
+//             mstEdges.push_back(e);
+//             mstWeight += e.w;
+//         }
+//     }
+
+//     cout << "Edges in MST:\n";
+//     for (auto &e : mstEdges) 
+//     {
+//         cout << e.u << " - " << e.v << " (weight " << e.w << ")\n";
+//     }
+//     cout << "Total weight of MST: " << mstWeight << "\n";
+
+//     return 0;
+// }
+
+
+void computeLPS(const string &pat, vector<int> &lps) 
 {
-    int u, v, w;
-};
+    int m = pat.size();
+    lps.assign(m, 0);
 
-struct DSU
+    int len = 0; // length of previous longest prefix suffix
+    int i = 1;
+
+    while (i < m) 
+    {
+        if (pat[i] == pat[len]) 
+        {
+            len++;
+            lps[i] = len;
+            i++;
+        } 
+        else 
+        {
+            if (len != 0) 
+            {
+                len = lps[len - 1];
+            } 
+            else 
+            {
+                lps[i] = 0;
+                i++;
+            }
+        }
+    }
+}
+
+void KMPSearch(const string &text, const string &pat) 
 {
-    vector<int> parent, rank;
-
-    DSU (int n)
+    int n = text.size();
+    int m = pat.size();
+    if (m == 0) 
     {
-        parent.resize(n);
-        rank.assign(n, 0);
+        cout << "Empty pattern.\n";
+        return;
+    }
 
-        for(int i = 0; i < n; i++)
+    vector<int> lps;
+    computeLPS(pat, lps);
+
+    int i = 0; // index for text
+    int j = 0; // index for pattern
+
+    bool found = false;
+    while (i < n) 
+    {
+        if (text[i] == pat[j]) 
         {
-            parent[i] = i;
+            i++;
+            j++;
+        }
+
+        if (j == m) 
+        {
+            cout << "Pattern found at index " << (i - j) << "\n";
+            found = true;
+            j = lps[j - 1]; // continue searching
+        } 
+        else if (i < n && text[i] != pat[j]) 
+        {
+            if (j != 0) 
+            {
+                j = lps[j - 1];
+            } 
+            else 
+            {
+                i++;
+            }
         }
     }
 
-    int find(int x)
+    if (!found) 
     {
-        if(parent[x] == x)
-        {
-            return x;
-        }
-        return parent[x] = find(parent[x]); // path compression
+        cout << "Pattern not found\n";
     }
-
-    void unite(int x, int y)
-    {
-        x = find(x);
-        y = find(y);
-
-        if(x == y) return;
-
-        if(rank[x] < rank[y])
-            parent[x] = y;
-        else if(rank[y] < rank[x])
-            parent[y] = x;
-        else
-        {
-            parent[y] = x;
-            rank[x]++;
-        }
-    }
-};
+}
 
 int main() 
 {
-    int V, E;
+    string text, pat;
+    
+    cout << "Enter text: ";
+    getline(cin, text);
+    if (text.empty()) getline(cin, text); // handle leftover newline
 
-    cout << "Enter number of vertices: ";
-    cin >> V;
-    cout << "Enter number of edges: ";
-    cin >> E;
+    cout << "Enter pattern: ";
+    getline(cin, pat);
 
-    vector<Edge> edges(E);
-
-    cout << "Enter edges (u v w) with vertices numbered 0 to " << V - 1 << ":\n";
-
-    for (int i = 0; i < E; i++) 
-    {
-        cin >> edges[i].u >> edges[i].v >> edges[i].w;
-    }
-
-    // Sort edges by weight
-    sort(edges.begin(), edges.end(), [](const Edge &a, const Edge &b) 
-    {
-        return a.w < b.w;
-    });
-
-    DSU dsu(V);
-    int mstWeight = 0;
-    vector<Edge> mstEdges;
-
-    for (auto &e : edges) 
-    {
-        if (dsu.find(e.u) != dsu.find(e.v)) 
-        {
-            dsu.unite(e.u, e.v);
-            mstEdges.push_back(e);
-            mstWeight += e.w;
-        }
-    }
-
-    cout << "Edges in MST:\n";
-    for (auto &e : mstEdges) 
-    {
-        cout << e.u << " - " << e.v << " (weight " << e.w << ")\n";
-    }
-    cout << "Total weight of MST: " << mstWeight << "\n";
+    KMPSearch(text, pat);
 
     return 0;
 }
