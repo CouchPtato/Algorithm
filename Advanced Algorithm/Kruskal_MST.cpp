@@ -1,3 +1,6 @@
+
+// Write a program to determine the minimum spanning tree of a graph using Kruskal’s algorithm. 
+
 #include <bits/stdc++.h>
 using namespace std;
 
