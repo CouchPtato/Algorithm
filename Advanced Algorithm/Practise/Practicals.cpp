@@ -192,100 +192,163 @@ using namespace std;
 //     return 0;
 // }
 
-
-void computeLPS(const string &pat, vector<int> &lps) 
+struct Edge 
 {
-    int m = pat.size();
-    lps.assign(m, 0);
-
-    int len = 0; // length of previous longest prefix suffix
-    int i = 1;
-
-    while (i < m) 
-    {
-        if (pat[i] == pat[len]) 
-        {
-            len++;
-            lps[i] = len;
-            i++;
-        } 
-        else 
-        {
-            if (len != 0) 
-            {
-                len = lps[len - 1];
-            } 
-            else 
-            {
-                lps[i] = 0;
-                i++;
-            }
-        }
-    }
-}
-
-void KMPSearch(const string &text, const string &pat) 
-{
-    int n = text.size();
-    int m = pat.size();
-    if (m == 0) 
-    {
-        cout << "Empty pattern.\n";
-        return;
-    }
-
-    vector<int> lps;
-    computeLPS(pat, lps);
-
-    int i = 0; // index for text
-    int j = 0; // index for pattern
-
-    bool found = false;
-    while (i < n) 
-    {
-        if (text[i] == pat[j]) 
-        {
-            i++;
-            j++;
-        }
-
-        if (j == m) 
-        {
-            cout << "Pattern found at index " << (i - j) << "\n";
-            found = true;
-            j = lps[j - 1]; // continue searching
-        } 
-        else if (i < n && text[i] != pat[j]) 
-        {
-            if (j != 0) 
-            {
-                j = lps[j - 1];
-            } 
-            else 
-            {
-                i++;
-            }
-        }
-    }
-
-    if (!found) 
-    {
-        cout << "Pattern not found\n";
-    }
-}
+    int u, v, w;
+};
 
 int main() 
 {
-    string text, pat;
-    
-    cout << "Enter text: ";
-    getline(cin, text);
-    if (text.empty()) getline(cin, text); // handle leftover newline
+    int V, E;
+    cout << "Enter number of vertices: ";
+    cin >> V;
+    cout << "Enter number of edges: ";
+    cin >> E;
 
-    cout << "Enter pattern: ";
-    getline(cin, pat);
+    vector<Edge> edges(E);
+    cout << "Enter edges (u v w) with vertices numbered 0 to " << V - 1 << ":\n";
+    for (int i = 0; i < E; i++) 
+    {
+        cin >> edges[i].u >> edges[i].v >> edges[i].w;
+    }
 
-    KMPSearch(text, pat);
+    int src;
+    cout << "Enter source vertex: ";
+    cin >> src;
+
+    const int INF = INT_MAX;
+    vector<int> dist(V, INF);
+    dist[src] = 0;
+
+    // Relax edges V-1 times
+    for (int i = 1; i <= V - 1; i++) 
+    {
+        for (auto &e : edges) 
+        {
+            if (dist[e.u] != INF && dist[e.u] + e.w < dist[e.v]) {
+                dist[e.v] = dist[e.u] + e.w;
+            }
+        }
+    }
+
+    // Check for negative weight cycles
+    bool hasNegativeCycle = false;
+    for (auto &e : edges) 
+    {
+        if (dist[e.u] != INF && dist[e.u] + e.w < dist[e.v]) 
+        {
+            hasNegativeCycle = true;
+            break;
+        }
+    }
+
+    if (hasNegativeCycle) {
+        cout << "Graph contains a negative weight cycle.\n";
+    } else {
+        cout << "Shortest distances from source " << src << ":\n";
+        for (int i = 0; i < V; i++) {
+            cout << "Vertex " << i << " : ";
+            if (dist[i] == INF) cout << "INF\n";
+            else cout << dist[i] << "\n";
+        }
+    }
 
     return 0;
 }
+
+// void computeLPS(const string &pat, vector<int> &lps) 
+// {
+//     int m = pat.size();
+//     lps.assign(m, 0);
+
+//     int len = 0; // length of previous longest prefix suffix
+//     int i = 1;
+
+//     while (i < m) 
+//     {
+//         if (pat[i] == pat[len]) 
+//         {
+//             len++;
+//             lps[i] = len;
+//             i++;
+//         } 
+//         else 
+//         {
+//             if (len != 0) 
+//             {
+//                 len = lps[len - 1];
+//             } 
+//             else 
+//             {
+//                 lps[i] = 0;
+//                 i++;
+//             }
+//         }
+//     }
+// }
+
+// void KMPSearch(const string &text, const string &pat) 
+// {
+//     int n = text.size();
+//     int m = pat.size();
+//     if (m == 0) 
+//     {
+//         cout << "Empty pattern.\n";
+//         return;
+//     }
+
+//     vector<int> lps;
+//     computeLPS(pat, lps);
+
+//     int i = 0; // index for text
+//     int j = 0; // index for pattern
+
+//     bool found = false;
+//     while (i < n) 
+//     {
+//         if (text[i] == pat[j]) 
+//         {
+//             i++;
+//             j++;
+//         }
+
+//         if (j == m) 
+//         {
+//             cout << "Pattern found at index " << (i - j) << "\n";
+//             found = true;
+//             j = lps[j - 1]; // continue searching
+//         } 
+//         else if (i < n && text[i] != pat[j]) 
+//         {
+//             if (j != 0) 
+//             {
+//                 j = lps[j - 1];
+//             } 
+//             else 
+//             {
+//                 i++;
+//             }
+//         }
+//     }
+
+//     if (!found) 
+//     {
+//         cout << "Pattern not found\n";
+//     }
+// }
+
+// int main() 
+// {
+//     string text, pat;
+
+//     cout << "Enter text: ";
+//     getline(cin, text);
+//     if (text.empty()) getline(cin, text); // handle leftover newline
+
+//     cout << "Enter pattern: ";
+//     getline(cin, pat);
+
+//     KMPSearch(text, pat);
+
+//     return 0;
+// }
